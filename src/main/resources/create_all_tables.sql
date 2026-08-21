@@ -192,13 +192,13 @@ CREATE TABLE moon_messages (
     INDEX idx_moon_messages_verse_id (verse_id),
 
     -- 보름달 삭제 시 해당 메시지도 같이 삭제
-    CONSTdamaversesRAINT fk_moon_messages_moon
+    CONSTRAINT fk_moon_messages_moon
         FOREIGN KEY (moon_id)
         REFERENCES moons(id)
         ON DELETE CASCADE,
-dama
+
     -- 사용 중인 제공 말씀은 임의 삭제 방지
-    CONSTRAINT fk_moon_messages_verse
+	     CONSTRAINT fk_moon_messages_verse
         FOREIGN KEY (verse_id)
         REFERENCES verses(id)
         ON DELETE RESTRICT

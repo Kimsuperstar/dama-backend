@@ -32,13 +32,29 @@ public class MoonServiceImpl implements MoonService {
         return moonRepository.save(moon);
 	}
 
-	@Override
-	public Moon getMoon(Long moonId) {
-        // moonId로 DB에서 보름달 조회
-        return moonRepository.findById(moonId)
+	// 공유 링크로 보름달 조회
+    @Override
+    public Moon getMoonByShareToken(String shareToken) {
+
+        return moonRepository.findByShareToken(shareToken)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("존재하지 않는 보름달입니다.")
+                        new IllegalArgumentException(
+                                "존재하지 않는 보름달입니다."
+                        )
                 );
-	}
+    }
+	
+    @Override
+    public Moon getMyMoon(Long userId, Integer seasonYear) {
+
+    	// 로그인한 사용자의 시즌별 보름달 조회
+        return moonRepository
+                .findByUserIdAndSeasonYear(userId, seasonYear)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "해당 시즌의 보름달이 존재하지 않습니다."
+                        )
+                );
+    }
 
 }
