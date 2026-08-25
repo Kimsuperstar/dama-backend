@@ -9,4 +9,10 @@ public interface UserService {
             SocialProvider provider,
             String providerId
     );
+    
+    UserMeResponse updateNickname(
+            SocialProvider provider,
+            String providerId,
+            String nickname
+    );
 }

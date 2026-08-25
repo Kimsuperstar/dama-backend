@@ -3,10 +3,13 @@ package com.dama.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dama.dto.UserMeResponse;
+import com.dama.dto.UserNicknameUpdateRequest;
 import com.dama.entity.enums.SocialProvider;
 import com.dama.service.UserService;
 
@@ -51,7 +54,41 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
+    // 내 닉네임 변경
+    @PatchMapping("/me/nickname")
+    public ResponseEntity<UserMeResponse> updateNickname(
+            OAuth2AuthenticationToken authentication,
+            @RequestBody UserNicknameUpdateRequest request
+    ) {
 
+        // 어떤 소셜 로그인인지 확인
+        String registrationId =
+                authentication
+                        .getAuthorizedClientRegistrationId();
+
+        // 카카오 사용자 ID
+        Long kakaoId =
+                authentication
+                        .getPrincipal()
+                        .getAttribute("id");
+
+        String providerId =
+                kakaoId.toString();
+
+        SocialProvider provider =
+                getSocialProvider(registrationId);
+
+        UserMeResponse response =
+                userService.updateNickname(
+                        provider,
+                        providerId,
+                        request.getNickname()
+                );
+
+        return ResponseEntity.ok(response);
+    }
+
+ // OAuth registrationId → SocialProvider 변환
     private SocialProvider getSocialProvider(
             String registrationId
     ) {

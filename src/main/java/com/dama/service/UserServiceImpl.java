@@ -36,4 +36,23 @@ public class UserServiceImpl implements UserService {
 
         return UserMeResponse.from(user);
     }
+
+	@Override
+	@Transactional
+	public UserMeResponse updateNickname(SocialProvider provider, String providerId, String nickname) {
+		 User user = userRepository
+		            .findByProviderAndProviderId(
+		                    provider,
+		                    providerId
+		            )
+		            .orElseThrow(() ->
+		                    new IllegalStateException(
+		                            "로그인 사용자를 찾을 수 없습니다."
+		                    )
+		            );
+
+		 	user.updateNickname(nickname);
+
+		    return UserMeResponse.from(user);
+		}
 }
