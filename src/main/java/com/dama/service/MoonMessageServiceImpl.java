@@ -217,4 +217,22 @@ public class MoonMessageServiceImpl implements MoonMessageService {
 	            .toList();
 	}
 
+
+	@Override
+	public long getMessageCountByShareToken(String shareToken) {
+		Moon moon = moonRepository
+	            .findByShareToken(shareToken)
+	            .orElseThrow(() ->
+	                    new ResponseStatusException(
+	                            HttpStatus.NOT_FOUND,
+	                            "존재하지 않는 보름달입니다."
+	                    )
+	            );
+
+	    return moonMessageRepository
+	            .countByMoon_Id(
+	                    moon.getId()
+	            );
+	}
+
 }

@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.dama.service.CustomOAuth2UserService;
 
@@ -20,6 +21,9 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     @Bean
     SecurityFilterChain securityFilterChain(
@@ -84,9 +88,25 @@ public class SecurityConfig {
 
                 // 로그인 성공 후 React로 이동
                 .defaultSuccessUrl(
-                        "http://localhost:5173/?login=success",
+                		frontendUrl + "/?login=success",
                         true
                 )
+                .failureHandler((request, response, exception) -> {
+
+                    System.err.println(
+                            "========== OAuth 로그인 실패 =========="
+                    );
+
+                    exception.printStackTrace();
+
+                    System.err.println(
+                            "======================================="
+                    );
+
+                    response.sendRedirect(
+                            frontendUrl + "/?login=error"
+                    );
+                })
             )
         
 	        .logout(logout -> logout

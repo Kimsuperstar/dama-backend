@@ -16,6 +16,8 @@ public class MoonResponse {
     private Integer seasonYear;
 
     private String shareToken;
+    
+    private int receivedCount;
 
     public static MoonResponse from(Moon moon) {
 
@@ -23,7 +25,23 @@ public class MoonResponse {
                 moon.getId(),
                 moon.getOwnerName(),
                 moon.getSeasonYear(),
-                moon.getShareToken()
+                moon.getShareToken(),
+                0
+        );
+    }
+
+
+    public static MoonResponse from(
+            Moon moon,
+            int receivedCount
+    ) {
+
+        return new MoonResponse(
+                moon.getId(),
+                moon.getOwnerName(),
+                moon.getSeasonYear(),
+                moon.getShareToken(),
+                receivedCount
         );
     }
 }

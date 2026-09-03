@@ -10,4 +10,6 @@ public interface MoonMessageService {
 	 MoonMessageResponse createMessage(String shareToken, MoonMessageCreateRequest request);
 	 
 	 List<MoonMessageResponse> getMessages(Long moonId);
+	 
+	 long getMessageCountByShareToken(String shareToken);
 }

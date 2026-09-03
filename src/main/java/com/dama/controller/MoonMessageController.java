@@ -68,4 +68,21 @@ public class MoonMessageController {
 
         return ResponseEntity.ok(response);
     }
+    
+    @GetMapping(
+            "/share/{shareToken}/messages/count"
+    )
+    public ResponseEntity<Long> getMessageCount(
+            @PathVariable("shareToken")
+            String shareToken
+    ) {
+
+        long count =
+                moonMessageService
+                        .getMessageCountByShareToken(
+                                shareToken
+                        );
+
+        return ResponseEntity.ok(count);
+    }
 }

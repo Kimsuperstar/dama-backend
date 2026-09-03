@@ -12,6 +12,7 @@ import com.dama.dto.MoonResponse;
 import com.dama.entity.Moon;
 import com.dama.entity.User;
 import com.dama.entity.enums.SocialProvider;
+import com.dama.repository.MoonMessageRepository;
 import com.dama.repository.MoonRepository;
 import com.dama.repository.UserRepository;
 
@@ -24,6 +25,7 @@ public class MoonServiceImpl implements MoonService {
 
     private final MoonRepository moonRepository;
     private final UserRepository userRepository;
+    private final MoonMessageRepository moonMessageRepository;
 
 
     // 내 보름달 생성
@@ -83,13 +85,14 @@ public class MoonServiceImpl implements MoonService {
     }
 
 
-    // 공유 링크로 보름달 조회
+ // 공유 링크로 보름달 조회
     @Override
     public MoonResponse getMoonByShareToken(
             String shareToken
     ) {
 
-    	Moon moon = moonRepository
+        // 1. shareToken으로 Moon 조회
+        Moon moon = moonRepository
                 .findByShareToken(shareToken)
                 .orElseThrow(() ->
                         new ResponseStatusException(
@@ -98,7 +101,21 @@ public class MoonServiceImpl implements MoonService {
                         )
                 );
 
-        return MoonResponse.from(moon);
+
+        // 2. 해당 Moon이 받은 말씀 개수 조회
+        int receivedCount =
+                moonMessageRepository
+                        .findByMoon_IdOrderByCreatedAtDesc(
+                                moon.getId()
+                        )
+                        .size();
+
+
+        // 3. Moon 정보 + 받은 말씀 개수 반환
+        return MoonResponse.from(
+                moon,
+                receivedCount
+        );
     }
 
 
