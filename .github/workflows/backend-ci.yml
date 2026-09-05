@@ -13,6 +13,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_DATABASE: dama
+          MARIADB_USER: dama
+          MARIADB_PASSWORD: dama1234
+          MARIADB_ROOT_PASSWORD: root1234
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -27,4 +43,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mariadb://localhost:3306/dama
+          SPRING_DATASOURCE_USERNAME: dama
+          SPRING_DATASOURCE_PASSWORD: dama1234
         run: ./gradlew clean build
