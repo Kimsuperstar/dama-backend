@@ -50,4 +50,5 @@ jobs:
           APP_FRONTEND_URL: ${{ vars.APP_FRONTEND_URL }}
           KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
           KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REDIRECT_URI: http://localhost:8080/login/oauth2/code/kakao
         run: ./gradlew clean build --stacktrace --info
