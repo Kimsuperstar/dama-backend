@@ -75,7 +75,7 @@ public class MoonMessageServiceImpl implements MoonMessageService {
 
 
         // 기존 말씀을 선택한 경우
-        if ("VERSE".equals(sourceType)) {
+        if ("PROVIDED".equals(sourceType)) {
 
             if (request.getVerseId() == null) {
                 throw new ResponseStatusException(

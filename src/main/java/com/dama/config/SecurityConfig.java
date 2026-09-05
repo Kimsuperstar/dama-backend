@@ -52,6 +52,12 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/api/v1/moons/share/**"
                 ).permitAll()
+                
+                // 말씀 목록 조회
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/v1/verses/**"
+                ).permitAll()
 
                 // OAuth 관련 주소
                 .requestMatchers(

@@ -42,7 +42,7 @@ public class MoonMessage {
     private Moon moon;
 
 
-    // VERSE / MANUAL
+    // PROVIDED / MANUAL
     @Column(name = "source_type")
     private String sourceType;
 
