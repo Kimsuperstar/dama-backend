@@ -41,6 +41,8 @@ public class MoonMessageResponse {
 
     private LocalDateTime createdAt;
 
+    private Boolean locked;
+
 
     // =========================================================
     // 생성자
@@ -59,7 +61,8 @@ public class MoonMessageResponse {
             String personalMessage,
             String authorName,
             Boolean isAnonymous,
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            Boolean locked
     ) {
 
         this.id = id;
@@ -78,6 +81,7 @@ public class MoonMessageResponse {
         this.authorName = authorName;
         this.isAnonymous = isAnonymous;
         this.createdAt = createdAt;
+        this.locked = locked;
     }
 
 
@@ -135,7 +139,56 @@ public class MoonMessageResponse {
 
                 message.getIsAnonymous(),
 
-                message.getCreatedAt()
+                message.getCreatedAt(),
+
+                false
+        );
+    }
+
+    public static MoonMessageResponse lockedFrom(
+            MoonMessage message
+    ) {
+
+        Verse verse =
+                message.getVerse();
+
+        return new MoonMessageResponse(
+
+                message.getId(),
+
+                message.getMoon().getId(),
+
+                message.getSourceType(),
+
+                verse != null
+                        ? verse.getId()
+                        : null,
+
+                verse != null
+                        ? verse.getCategory()
+                        : (
+                            message.getCategory() != null
+                                ? message.getCategory().name()
+                                : null
+                        ),
+
+                null,
+
+                null,
+
+                null,
+
+                null,
+
+                null,
+
+                null,
+
+                true,
+
+                message.getCreatedAt(),
+
+                true
         );
     }
 }

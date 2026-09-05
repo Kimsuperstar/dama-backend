@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dama.dto.UserMeResponse;
 import com.dama.entity.User;
 import com.dama.entity.enums.SocialProvider;
+import com.dama.entity.enums.UserRole;
 import com.dama.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -55,4 +56,19 @@ public class UserServiceImpl implements UserService {
 
 		    return UserMeResponse.from(user);
 		}
+
+    @Override
+    public boolean isAdmin(
+            SocialProvider provider,
+            String providerId
+    ) {
+
+        return userRepository
+                .findByProviderAndProviderId(
+                        provider,
+                        providerId
+                )
+                .map(user -> user.getRole() == UserRole.ADMIN)
+                .orElse(false);
+    }
 }

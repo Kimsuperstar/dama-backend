@@ -197,7 +197,10 @@ public class MoonMessageServiceImpl implements MoonMessageService {
 
 
 	@Override
-	public List<MoonMessageResponse> getMessages(Long moonId) {
+	public List<MoonMessageResponse> getMessages(
+            Long moonId,
+            boolean canPreviewMessages
+    ) {
 		// Moon 존재 여부 확인
 	    moonRepository
 	            .findById(moonId)
@@ -213,7 +216,11 @@ public class MoonMessageServiceImpl implements MoonMessageService {
 	                    moonId
 	            )
 	            .stream()
-	            .map(MoonMessageResponse::from)
+	            .map(message ->
+                        canPreviewMessages
+                                ? MoonMessageResponse.from(message)
+                                : MoonMessageResponse.lockedFrom(message)
+                )
 	            .toList();
 	}
 

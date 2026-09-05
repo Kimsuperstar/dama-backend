@@ -15,4 +15,9 @@ public interface UserService {
             String providerId,
             String nickname
     );
+
+    boolean isAdmin(
+            SocialProvider provider,
+            String providerId
+    );
 }

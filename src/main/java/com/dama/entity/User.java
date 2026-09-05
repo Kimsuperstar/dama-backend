@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.dama.entity.enums.SocialProvider;
+import com.dama.entity.enums.UserRole;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,6 +50,10 @@ public class User {
     @Column(nullable = false)
     private String nickname;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "varchar(20) default 'USER'")
+    private UserRole role = UserRole.USER;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -65,6 +70,7 @@ public class User {
         this.provider = provider;
         this.providerId = providerId;
         this.nickname = nickname;
+        this.role = UserRole.USER;
     }
 
     public void updateNickname(String nickname) {

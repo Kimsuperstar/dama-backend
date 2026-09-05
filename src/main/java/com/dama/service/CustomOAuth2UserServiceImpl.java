@@ -131,4 +131,5 @@ public class CustomOAuth2UserServiceImpl
 
         return nickname.toString();
     }
+
 }

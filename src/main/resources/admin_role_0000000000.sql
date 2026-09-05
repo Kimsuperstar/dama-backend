@@ -1,0 +1,10 @@
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'USER';
+
+UPDATE users
+SET role = 'USER'
+WHERE provider_id <> '0000000000';
+
+UPDATE users
+SET role = 'ADMIN'
+WHERE provider_id = '0000000000';
