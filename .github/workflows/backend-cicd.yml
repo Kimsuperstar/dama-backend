@@ -1,0 +1,143 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  # ==========================================
+  # CI
+  # ==========================================
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_DATABASE: dama
+          MARIADB_USER: dama
+          MARIADB_PASSWORD: dama1234
+          MARIADB_ROOT_PASSWORD: root1234
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for Gradle
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        env:
+          SPRING_PROFILES_ACTIVE: ci
+          SPRING_DATASOURCE_URL: jdbc:mariadb://localhost:3306/dama
+          SPRING_DATASOURCE_USERNAME: dama
+          SPRING_DATASOURCE_PASSWORD: dama1234
+          APP_FRONTEND_URL: ${{ vars.APP_FRONTEND_URL }}
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+        run: ./gradlew clean build --stacktrace
+
+      - name: Prepare deploy JAR
+        run: |
+          JAR_FILE=$(find build/libs -maxdepth 1 -type f -name "*.jar" ! -name "*-plain.jar" | head -n 1)
+
+          if [ -z "$JAR_FILE" ]; then
+            echo "배포할 JAR 파일을 찾을 수 없습니다."
+            exit 1
+          fi
+
+          cp "$JAR_FILE" dama.jar
+          ls -lh dama.jar
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dama-backend
+          path: dama.jar
+          retention-days: 1
+
+
+  # ==========================================
+  # CD
+  # ==========================================
+  deploy:
+    needs: build
+
+    # PR에서는 배포하지 않고 main push에서만 배포
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dama-backend
+
+      - name: Setup SSH
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+
+      - name: Create production environment file
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          APP_FRONTEND_URL: ${{ vars.APP_FRONTEND_URL }}
+        run: |
+          printf 'DB_URL=%s\n' "$DB_URL" > .env
+          printf 'DB_USERNAME=%s\n' "$DB_USERNAME" >> .env
+          printf 'DB_PASSWORD=%s\n' "$DB_PASSWORD" >> .env
+          printf 'KAKAO_CLIENT_ID=%s\n' "$KAKAO_CLIENT_ID" >> .env
+          printf 'KAKAO_CLIENT_SECRET=%s\n' "$KAKAO_CLIENT_SECRET" >> .env
+          printf 'APP_FRONTEND_URL=%s\n' "$APP_FRONTEND_URL" >> .env
+
+      - name: Deploy files to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          scp -i ~/.ssh/id_rsa dama.jar \
+            "$EC2_USER@$EC2_HOST:/home/ec2-user/dama/dama.jar"
+
+          scp -i ~/.ssh/id_rsa .env \
+            "$EC2_USER@$EC2_HOST:/home/ec2-user/dama/.env"
+
+      - name: Restart Spring Boot
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh -i ~/.ssh/id_rsa "$EC2_USER@$EC2_HOST" << 'EOF'
+            chmod 600 /home/ec2-user/dama/.env
+            sudo systemctl restart dama
+            sudo systemctl status dama --no-pager
+          EOF
