@@ -111,6 +111,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
           KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+          KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
           APP_FRONTEND_URL: ${{ vars.APP_FRONTEND_URL }}
         run: |
           printf 'DB_URL=%s\n' "$DB_URL" > .env
@@ -118,6 +119,7 @@ jobs:
           printf 'DB_PASSWORD=%s\n' "$DB_PASSWORD" >> .env
           printf 'KAKAO_CLIENT_ID=%s\n' "$KAKAO_CLIENT_ID" >> .env
           printf 'KAKAO_CLIENT_SECRET=%s\n' "$KAKAO_CLIENT_SECRET" >> .env
+          printf 'KAKAO_REDIRECT_URI=%s\n' "$KAKAO_REDIRECT_URI" >> .env
           printf 'APP_FRONTEND_URL=%s\n' "$APP_FRONTEND_URL" >> .env
 
       - name: Deploy files to EC2
