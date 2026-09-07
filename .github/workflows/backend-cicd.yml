@@ -119,8 +119,8 @@ jobs:
           printf 'DB_PASSWORD=%s\n' "$DB_PASSWORD" >> .env
           printf 'KAKAO_CLIENT_ID=%s\n' "$KAKAO_CLIENT_ID" >> .env
           printf 'KAKAO_CLIENT_SECRET=%s\n' "$KAKAO_CLIENT_SECRET" >> .env
-          printf 'KAKAO_REDIRECT_URI=%s\n' "$KAKAO_REDIRECT_URI_PROD" >> .env
-          printf 'APP_FRONTEND_URL=%s\n' "$APP_FRONTEND_URL_PROD" >> .env
+          printf 'KAKAO_REDIRECT_URI=%s\n' "$KAKAO_REDIRECT_URI" >> .env
+          printf 'APP_FRONTEND_URL=%s\n' "$APP_FRONTEND_URL" >> .env
 
       - name: Deploy files to EC2
         env:
