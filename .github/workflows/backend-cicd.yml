@@ -52,7 +52,7 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:mariadb://localhost:3306/dama
           SPRING_DATASOURCE_USERNAME: dama
           SPRING_DATASOURCE_PASSWORD: dama1234
-          APP_FRONTEND_URL: ${{ vars.APP_FRONTEND_URL }}
+          APP_FRONTEND_URL: ${{ vars.APP_FRONTEND_URL_CI }}
           KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
           KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
         run: ./gradlew clean build --stacktrace
@@ -111,16 +111,16 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
           KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
-          KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
-          APP_FRONTEND_URL: ${{ vars.APP_FRONTEND_URL }}
+          KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI_PROD }}
+          APP_FRONTEND_URL: ${{ vars.APP_FRONTEND_URL_PROD }}
         run: |
           printf 'DB_URL=%s\n' "$DB_URL" > .env
           printf 'DB_USERNAME=%s\n' "$DB_USERNAME" >> .env
           printf 'DB_PASSWORD=%s\n' "$DB_PASSWORD" >> .env
           printf 'KAKAO_CLIENT_ID=%s\n' "$KAKAO_CLIENT_ID" >> .env
           printf 'KAKAO_CLIENT_SECRET=%s\n' "$KAKAO_CLIENT_SECRET" >> .env
-          printf 'KAKAO_REDIRECT_URI=%s\n' "$KAKAO_REDIRECT_URI" >> .env
-          printf 'APP_FRONTEND_URL=%s\n' "$APP_FRONTEND_URL" >> .env
+          printf 'KAKAO_REDIRECT_URI=%s\n' "$KAKAO_REDIRECT_URI_PROD" >> .env
+          printf 'APP_FRONTEND_URL=%s\n' "$APP_FRONTEND_URL_PROD" >> .env
 
       - name: Deploy files to EC2
         env:
